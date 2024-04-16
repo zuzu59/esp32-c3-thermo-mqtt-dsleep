@@ -1,4 +1,4 @@
-// Juste un teste de faire un thermomètre enregistreur très minimaliste avec le capteur 
+// Juste un test de faire un thermomètre enregistreur très minimaliste avec le capteur 
 // de température interne d'un esp32-c3-super-mini
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
