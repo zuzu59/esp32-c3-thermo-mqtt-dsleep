@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240416.1935
+// zf240416.2018
 //
 // Utilisation:
 //
@@ -21,6 +21,7 @@
 // https://www.espboards.dev/blog/esp32-inbuilt-temperature-sensor
 // https://forum.fritzing.org/t/need-esp32-c3-super-mini-board-model/20561
 // https://www.digikey.fr/fr/resources/conversion-calculators/conversion-calculator-voltage-divider
+// https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
 //
 
 
@@ -189,6 +190,11 @@ void loop() {
 
     temp_sensor_read_celsius(&sensorValue1);
     sensorValue2 = analogRead(sensorPin);
+
+    // fonction de conversion bit to volts de l'ADC avec le diviseur résistif et de la diode !
+    // voir https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
+    // 0.001034 * (ADC - 2380) + 3.6
+
 
     mqtt.loop();
 
