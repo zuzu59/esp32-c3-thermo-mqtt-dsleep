@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240416.1550
+// zf240416.1752
 //
 // Utilisation:
 //
@@ -32,6 +32,10 @@
 // General
 const int ledPin = 8;    // the number of the LED pin
 const int buttonPin = 9;  // the number of the pushbutton pin
+int sensorPin = A0;   // select the input pin for battery meter
+int sensorValue = 0;  // variable to store the value coming from the sensor
+
+
 
 // int sensorPin1 = 1;   // select the input pin for the sensor 1
 // long sensorValue1 = 0;  // variable to store the value coming from the sensor 1
@@ -143,9 +147,9 @@ void setup() {
     USBSerial.println("\n\n\n\n**************************************\nCa commence !\n");
 
     pinMode(ledPin, OUTPUT);
-    digitalWrite(ledPin, HIGH);
-    delay(500); 
     digitalWrite(ledPin, LOW);
+    delay(500); 
+    digitalWrite(ledPin, HIGH);
 
     // Temperature sensor internal initialise
     initTempSensor();
@@ -167,9 +171,9 @@ void setup() {
 
 
 void loop() {
-    digitalWrite(ledPin, HIGH);
-    delay(100); 
     digitalWrite(ledPin, LOW);
+    delay(100); 
+    digitalWrite(ledPin, HIGH);
 
 
 
@@ -182,6 +186,13 @@ void loop() {
     USBSerial.println(" °C");
 
 
+    // read the value from the sensor:
+    sensorValue = analogRead(sensorPin);
+
+    USBSerial.printf("ADC %i",sensorValue);
+    USBSerial.println("");
+
+    
     // USBSerial.printf("inclinaison:%f\n", calculateTilt());
 
 

@@ -1,7 +1,7 @@
 # esp32-c3-thermo-mqtt-dsleep
 Juste un test de faire un thermomètre enregistreur très minimaliste avec le capteur de température interne d'un esp32-c3-super-mini
 
-zf240416.1636
+zf240416.1646
 
 ## Buts
 Simplement faire un thermomètre enregistreur très minimaliste avec le capteur de température interne d'un esp32-c3-super-mini
@@ -10,6 +10,8 @@ Simplement faire un thermomètre enregistreur très minimaliste avec le capteur 
 ## Problématiques
 Comme le capteur de température se trouve à l'intérieur du esp32-c3, il mesure la température du chip !<br>
 Si on veut pouvoir mesurer la température ambiante, il faudra absolument travailler en mode dsleep.
+
+Et quand on travaille en mode dsleep, il faut envoyer le résultat sur un brocker MQTT via WIFI pour le recording !
 
 
 ## Moyens
