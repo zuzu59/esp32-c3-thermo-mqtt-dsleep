@@ -3,11 +3,13 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240415.1729
+// zf240416.1550
 //
 // Utilisation:
-// 
+//
 // Installation:
+// 
+// Il faut disabled USB CDC On Boot et utiliser USBSerial. au lieu de Serial. pour la console !
 //
 // Il faut installer cette lib pour le senseur de température interne
 // https://github.com/espressif/esp-idf/blob/master/components/driver/test_apps/legacy_rtc_temp_driver/main/test_rtc_temp_driver.c
@@ -16,9 +18,9 @@
 // https://github.com/dawidchyrzynski/arduino-home-assistant
 //
 // Sources:
-// https://www.espboards.dev/blog/esp32-inbuilt-temperature-sensor/#google_vignette
-
-
+// https://www.espboards.dev/blog/esp32-inbuilt-temperature-sensor
+// https://forum.fritzing.org/t/need-esp32-c3-super-mini-board-model/20561
+// https://www.digikey.fr/fr/resources/conversion-calculators/conversion-calculator-voltage-divider
 //
 
 
