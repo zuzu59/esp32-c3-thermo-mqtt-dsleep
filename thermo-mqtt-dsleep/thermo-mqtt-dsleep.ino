@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240416.1835
+// zf240416.1935
 //
 // Utilisation:
 //
@@ -83,8 +83,8 @@ HAMqtt mqtt(client, device);
 unsigned long lastUpdateAt = 0;
 
 // You should define your own ID.
-HASensorNumber Sensor1(SENSOR_NAME1);           // c'est le nom du sensor sur MQTT !
-HASensorNumber Sensor2(SENSOR_NAME2);           // c'est le nom du sensor sur MQTT !
+HASensorNumber Sensor1(SENSOR_NAME1, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
+HASensorNumber Sensor2(SENSOR_NAME2);                                // c'est le nom du sensor sur MQTT !
 
 static void ConnectMQTT() {
    device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
