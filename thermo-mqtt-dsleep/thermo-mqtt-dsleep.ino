@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240417.1946
+// zf240417.2312
 
 
 // il faut ajouter dans le mqtt le nombre de boot !
@@ -90,28 +90,26 @@ static void ConnectWiFi() {
 // MQTT
 #include <ArduinoHA.h>
 #define DEVICE_NAME      "thi1"
-// #define DEVICE_NAME      "thi2"
 #define SENSOR_NAME1     "Temperature"
 #define SENSOR_NAME2     "Battery"
 #define SENSOR_NAME3     "RSSI"
 #define SENSOR_NAME4     "bootCount"
 
 WiFiClient client;
-// HADevice device(DEVICE_NAME);                // c'est le IDS du device, il doit être unique !
-HADevice device("thi_01");                // c'est le IDS du device, il doit être unique !
+HADevice device(DEVICE_NAME);                // c'est le ID du device, il doit être unique !
 HAMqtt mqtt(client, device);
 unsigned long lastUpdateAt = 0;
 
-// You should define your own ID.
-HASensorNumber Sensor1(SENSOR_NAME1, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
-HASensorNumber Sensor2(SENSOR_NAME2, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
-HASensorNumber Sensor3(SENSOR_NAME3);   // c'est le nom du sensor sur MQTT !
-HASensorNumber Sensor4(SENSOR_NAME4);   // c'est le nom du sensor sur MQTT !
+// c'est le ID du sensor, il doit être unique !
+HASensorNumber Sensor1(DEVICE_NAME SENSOR_NAME1, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
+HASensorNumber Sensor2(DEVICE_NAME SENSOR_NAME2, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
+HASensorNumber Sensor3(DEVICE_NAME SENSOR_NAME3);   // c'est le nom du sensor sur MQTT !
+HASensorNumber Sensor4(DEVICE_NAME SENSOR_NAME4);   // c'est le nom du sensor sur MQTT !
 
 static void ConnectMQTT() {
-   device.setName("thi_02");                // c'est le nom du device sur Home Assistant !
+   device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
     // device.setSoftwareVersion("1.0.0");
-    mqtt.setDataPrefix("thi_03");             // c'est le nom du device sur MQTT !
+    mqtt.setDataPrefix(DEVICE_NAME);             // c'est le nom du device sur MQTT !
 
     Sensor1.setIcon("mdi:thermometer");
     Sensor1.setName(SENSOR_NAME1);           // c'est le nom du sensor sur Home Assistant !
