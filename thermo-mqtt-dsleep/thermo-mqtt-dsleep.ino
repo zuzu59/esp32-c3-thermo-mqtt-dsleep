@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240417.1604
+// zf240417.1623
 //
 // Utilisation:
 //
@@ -182,6 +182,13 @@ void print_wakeup_reason(){
 
 
 void setup() {
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, LOW);
+
+    // Il faut lire la température tout de suite au début avant que le MCU ne puisse chauffer !
+    initTempSensor();
+    readSensor();
+
     USBSerial.begin(19200);
     USBSerial.setDebugOutput(true);       //pour voir les messages de debug des libs sur la console série !
     delay(3000);  //le temps de passer sur la Serial Monitor ;-)
@@ -194,13 +201,26 @@ void setup() {
     //Print the wakeup reason for ESP32
     print_wakeup_reason();
 
-    /*
-    First we configure the wake up source
-    We set our ESP32 to wake up every 5 seconds
-    */
+    // First we configure the wake up source
     esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
-    USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) +
-    " Seconds");
+    USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
+
+    digitalWrite(ledPin, HIGH);
+    USBSerial.println("Connect WIFI !");
+    ConnectWiFi();
+    digitalWrite(ledPin, LOW);
+    delay(500); 
+
+    USBSerial.println("\n\nConnect MQTT !\n");
+    ConnectMQTT();
+
+    USBSerial.println("\nC'est parti !\n");
+
+    sendSensorMqtt();
+    USBSerial.printf("sensor1: %f,sensor2: %f\n", sensorValue1, sensorValue2);
+
+
+
 
 
     USBSerial.println("Going to sleep now");
@@ -212,35 +232,12 @@ void setup() {
 
 
 
-    pinMode(ledPin, OUTPUT);
-    digitalWrite(ledPin, LOW);
-    delay(500); 
-    digitalWrite(ledPin, HIGH);
 
-    // Temperature sensor internal initialise
-    initTempSensor();
 
-    USBSerial.println("Connect WIFI !");
-    ConnectWiFi();
-    digitalWrite(ledPin, HIGH);
-    delay(500); 
 
-    USBSerial.println("\n\nConnect MQTT !\n");
-    ConnectMQTT();
-
-    USBSerial.println("\nC'est parti !\n");
 }
 
 
 void loop() {
-    digitalWrite(ledPin, LOW);
-    delay(100); 
-    digitalWrite(ledPin, HIGH);
-
-    readSensor();
-    sendSensorMqtt();
-
-    USBSerial.printf("sensor1:%f,sensor2:%f\n", sensorValue1, sensorValue2);
-    delay(PUBLISH_INTERVAL);
 }
 
