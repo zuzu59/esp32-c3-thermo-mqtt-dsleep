@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240417.2312
+#define zVERSION "zf240417.0044"
 
 
 // il faut ajouter dans le mqtt le nombre de boot !
@@ -49,7 +49,7 @@ float sensorValue4 = 0;  // variable to store the value coming from the sensor 3
 
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  10        /* Time ESP32 will go to sleep (in seconds) */
+#define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 
 
@@ -107,9 +107,11 @@ HASensorNumber Sensor3(DEVICE_NAME SENSOR_NAME3);   // c'est le nom du sensor su
 HASensorNumber Sensor4(DEVICE_NAME SENSOR_NAME4);   // c'est le nom du sensor sur MQTT !
 
 static void ConnectMQTT() {
-   device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
-    // device.setSoftwareVersion("1.0.0");
+    device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
     mqtt.setDataPrefix(DEVICE_NAME);             // c'est le nom du device sur MQTT !
+    device.setSoftwareVersion(zVERSION);
+    device.setManufacturer("espressif");
+    device.setModel("esp32-c3 super mini");
 
     Sensor1.setIcon("mdi:thermometer");
     Sensor1.setName(SENSOR_NAME1);           // c'est le nom du sensor sur Home Assistant !
@@ -218,7 +220,7 @@ void setup() {
     USBSerial.println("\nC'est envoyé !\n");
 
     USBSerial.println("Going to sleep now");
-    delay(2000);
+    delay(200);
     USBSerial.flush(); 
     esp_deep_sleep_start();
     USBSerial.println("This will never be printed");
