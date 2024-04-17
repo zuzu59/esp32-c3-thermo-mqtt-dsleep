@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240416.2018
+// zf240417.1157
 //
 // Utilisation:
 //
@@ -39,7 +39,7 @@ int sensorPin = A0;   // select the input pin for battery meter
 
 
 float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
-long sensorValue2 = 0;  // variable to store the value coming from the sensor 2
+float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
 #define TEMP_CELSIUS 0
 
 
@@ -85,7 +85,7 @@ unsigned long lastUpdateAt = 0;
 
 // You should define your own ID.
 HASensorNumber Sensor1(SENSOR_NAME1, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
-HASensorNumber Sensor2(SENSOR_NAME2);                                // c'est le nom du sensor sur MQTT !
+HASensorNumber Sensor2(SENSOR_NAME2, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 
 static void ConnectMQTT() {
    device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
@@ -189,11 +189,14 @@ void loop() {
 
 
     temp_sensor_read_celsius(&sensorValue1);
-    sensorValue2 = analogRead(sensorPin);
 
     // fonction de conversion bit to volts de l'ADC avec le diviseur résistif et de la diode !
     // voir https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
     // 0.001034 * (ADC - 2380) + 3.6
+
+    uint16_t reading = analogRead(sensorPin);
+    // float voltage = reading * 5.f / 1023.f; // 0.0V - 5.0V
+    sensorValue2 = 0.001034 * (reading - 2380) + 3.6;            // 0.0V - 5.0V
 
 
     mqtt.loop();
@@ -201,7 +204,7 @@ void loop() {
     Sensor1.setValue(sensorValue1);
     Sensor2.setValue(sensorValue2);
 
-    USBSerial.printf("sensor1:%f,sensor2:%i\n", sensorValue1, sensorValue2);
+    USBSerial.printf("sensor1:%f,sensor2:%f\n", sensorValue1, sensorValue2);
 
     delay(PUBLISH_INTERVAL);
 
