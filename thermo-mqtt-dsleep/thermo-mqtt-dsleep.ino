@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240417.1554
+// zf240417.1604
 //
 // Utilisation:
 //
@@ -22,6 +22,7 @@
 // https://forum.fritzing.org/t/need-esp32-c3-super-mini-board-model/20561
 // https://www.digikey.fr/fr/resources/conversion-calculators/conversion-calculator-voltage-divider
 // https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
+// https://randomnerdtutorials.com/esp32-deep-sleep-arduino-ide-wake-up-sources/
 //
 
 
@@ -34,13 +35,14 @@
 const int ledPin = 8;    // the number of the LED pin
 const int buttonPin = 9;  // the number of the pushbutton pin
 int sensorPin = A0;   // select the input pin for battery meter
-// int sensorValue = 0;  // variable to store the value coming from the sensor
-
-
-
 float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
 float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
-#define TEMP_CELSIUS 0
+
+
+// Deep Sleep
+#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP  5        /* Time ESP32 will go to sleep (in seconds) */
+RTC_DATA_ATTR int bootCount = 0;
 
 
 // Temperature sensor internal
@@ -156,11 +158,59 @@ void sendSensorMqtt(){
 
 
 
+void print_wakeup_reason(){
+  esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch(wakeup_reason)
+  {
+    case ESP_SLEEP_WAKEUP_EXT0 : USBSerial.println("Wakeup caused by external signal using RTC_IO"); break;
+    case ESP_SLEEP_WAKEUP_EXT1 : USBSerial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+    case ESP_SLEEP_WAKEUP_TIMER : USBSerial.println("Wakeup caused by timer"); break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD : USBSerial.println("Wakeup caused by touchpad"); break;
+    case ESP_SLEEP_WAKEUP_ULP : USBSerial.println("Wakeup caused by ULP program"); break;
+    default : USBSerial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
+  }
+}
+
+
+
+
+
+
+
+
 void setup() {
     USBSerial.begin(19200);
     USBSerial.setDebugOutput(true);       //pour voir les messages de debug des libs sur la console série !
     delay(3000);  //le temps de passer sur la Serial Monitor ;-)
     USBSerial.println("\n\n\n\n**************************************\nCa commence !\n");
+
+    //Increment boot number and print it every reboot
+    ++bootCount;
+    USBSerial.println("Boot number: " + String(bootCount));
+
+    //Print the wakeup reason for ESP32
+    print_wakeup_reason();
+
+    /*
+    First we configure the wake up source
+    We set our ESP32 to wake up every 5 seconds
+    */
+    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+    USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) +
+    " Seconds");
+
+
+    USBSerial.println("Going to sleep now");
+    delay(1000);
+    USBSerial.flush(); 
+    esp_deep_sleep_start();
+    USBSerial.println("This will never be printed");
+
+
+
 
     pinMode(ledPin, OUTPUT);
     digitalWrite(ledPin, LOW);
@@ -169,10 +219,6 @@ void setup() {
 
     // Temperature sensor internal initialise
     initTempSensor();
-
-
-
-
 
     USBSerial.println("Connect WIFI !");
     ConnectWiFi();
