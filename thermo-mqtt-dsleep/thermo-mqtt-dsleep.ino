@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240417.1157
+// zf240417.1554
 //
 // Utilisation:
 //
@@ -136,6 +136,25 @@ void initTempSensor(){
 }
 
 
+// Lit les senseurs
+void readSensor(){
+    temp_sensor_read_celsius(&sensorValue1);
+    // fonction de conversion bit to volts de l'ADC avec le diviseur résistif et de la diode !
+    // voir https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
+    // 0.001034 * (ADC - 2380) + 3.6
+    uint16_t reading = analogRead(sensorPin);
+    sensorValue2 = 0.001034 * (reading - 2380) + 3.6;            // 2960 pour 4.2V et 2380 pour 3.6V
+}
+
+
+// Envoie les senseurs au mqtt
+void sendSensorMqtt(){
+    mqtt.loop();
+    Sensor1.setValue(sensorValue1);
+    Sensor2.setValue(sensorValue2);
+}
+
+
 
 void setup() {
     USBSerial.begin(19200);
@@ -172,42 +191,10 @@ void loop() {
     delay(100); 
     digitalWrite(ledPin, HIGH);
 
-    // USBSerial.print("Temperature: ");
-    // float result = 0;
-    // temp_sensor_read_celsius(&result);
-    // USBSerial.print(result);
-    // USBSerial.println(" °C");
-
-
-    // // read the value from the sensor:
-    // sensorValue = analogRead(sensorPin);
-
-    // USBSerial.printf("ADC %i",sensorValue);
-    // USBSerial.println("");
-
-    // USBSerial.printf("inclinaison:%f\n", calculateTilt());
-
-
-    temp_sensor_read_celsius(&sensorValue1);
-
-    // fonction de conversion bit to volts de l'ADC avec le diviseur résistif et de la diode !
-    // voir https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
-    // 0.001034 * (ADC - 2380) + 3.6
-
-    uint16_t reading = analogRead(sensorPin);
-    // float voltage = reading * 5.f / 1023.f; // 0.0V - 5.0V
-    sensorValue2 = 0.001034 * (reading - 2380) + 3.6;            // 0.0V - 5.0V
-
-
-    mqtt.loop();
-
-    Sensor1.setValue(sensorValue1);
-    Sensor2.setValue(sensorValue2);
+    readSensor();
+    sendSensorMqtt();
 
     USBSerial.printf("sensor1:%f,sensor2:%f\n", sensorValue1, sensorValue2);
-
     delay(PUBLISH_INTERVAL);
-
-    // delay(1000);
 }
 
