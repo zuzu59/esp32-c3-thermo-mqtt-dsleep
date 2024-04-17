@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240417.1813
+// zf240417.1946
 
 
 // il faut ajouter dans le mqtt le nombre de boot !
@@ -49,7 +49,7 @@ float sensorValue4 = 0;  // variable to store the value coming from the sensor 3
 
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  5        /* Time ESP32 will go to sleep (in seconds) */
+#define TIME_TO_SLEEP  10        /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 
 
@@ -97,7 +97,8 @@ static void ConnectWiFi() {
 #define SENSOR_NAME4     "bootCount"
 
 WiFiClient client;
-HADevice device(DEVICE_NAME);                // c'est le IDS du device, il doit être unique !
+// HADevice device(DEVICE_NAME);                // c'est le IDS du device, il doit être unique !
+HADevice device("thi_01");                // c'est le IDS du device, il doit être unique !
 HAMqtt mqtt(client, device);
 unsigned long lastUpdateAt = 0;
 
@@ -108,13 +109,13 @@ HASensorNumber Sensor3(SENSOR_NAME3);   // c'est le nom du sensor sur MQTT !
 HASensorNumber Sensor4(SENSOR_NAME4);   // c'est le nom du sensor sur MQTT !
 
 static void ConnectMQTT() {
-   device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
+   device.setName("thi_02");                // c'est le nom du device sur Home Assistant !
     // device.setSoftwareVersion("1.0.0");
-    mqtt.setDataPrefix(DEVICE_NAME);             // c'est le nom du device sur MQTT !
+    mqtt.setDataPrefix("thi_03");             // c'est le nom du device sur MQTT !
 
     Sensor1.setIcon("mdi:thermometer");
     Sensor1.setName(SENSOR_NAME1);           // c'est le nom du sensor sur Home Assistant !
-    Sensor1.setUnitOfMeasurement("°");
+    Sensor1.setUnitOfMeasurement("°C");
 
     Sensor2.setIcon("mdi:battery-charging-wireless-outline");
     Sensor2.setName(SENSOR_NAME2);           // c'est le nom du sensor sur Home Assistant !
@@ -219,7 +220,7 @@ void setup() {
     USBSerial.println("\nC'est envoyé !\n");
 
     USBSerial.println("Going to sleep now");
-    delay(200);
+    delay(2000);
     USBSerial.flush(); 
     esp_deep_sleep_start();
     USBSerial.println("This will never be printed");
