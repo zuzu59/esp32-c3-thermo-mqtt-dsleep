@@ -3,7 +3,12 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240417.1635
+// zf240417.1813
+
+
+// il faut ajouter dans le mqtt le nombre de boot !
+
+
 //
 // Utilisation:
 //
@@ -39,6 +44,7 @@ int sensorPin = A0;   // select the input pin for battery meter
 float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
 float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
 float sensorValue3 = 0;  // variable to store the value coming from the sensor 3
+float sensorValue4 = 0;  // variable to store the value coming from the sensor 3
 
 
 // Deep Sleep
@@ -83,12 +89,12 @@ static void ConnectWiFi() {
 
 // MQTT
 #include <ArduinoHA.h>
-#define DEVICE_NAME      "Ti1"
+#define DEVICE_NAME      "thi1"
+// #define DEVICE_NAME      "thi2"
 #define SENSOR_NAME1     "Temperature"
 #define SENSOR_NAME2     "Battery"
 #define SENSOR_NAME3     "RSSI"
-
-#define PUBLISH_INTERVAL  1000 // how often image should be published to HA (milliseconds)
+#define SENSOR_NAME4     "bootCount"
 
 WiFiClient client;
 HADevice device(DEVICE_NAME);                // c'est le IDS du device, il doit être unique !
@@ -98,7 +104,8 @@ unsigned long lastUpdateAt = 0;
 // You should define your own ID.
 HASensorNumber Sensor1(SENSOR_NAME1, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 HASensorNumber Sensor2(SENSOR_NAME2, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
-HASensorNumber Sensor3(SENSOR_NAME3);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
+HASensorNumber Sensor3(SENSOR_NAME3);   // c'est le nom du sensor sur MQTT !
+HASensorNumber Sensor4(SENSOR_NAME4);   // c'est le nom du sensor sur MQTT !
 
 static void ConnectMQTT() {
    device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
@@ -116,6 +123,10 @@ static void ConnectMQTT() {
     Sensor3.setIcon("mdi:wifi-strength-1");
     Sensor3.setName(SENSOR_NAME3);           // c'est le nom du sensor sur Home Assistant !
     Sensor3.setUnitOfMeasurement("dBm");
+
+    Sensor4.setIcon("mdi:counter");
+    Sensor4.setName(SENSOR_NAME4);           // c'est le nom du sensor sur Home Assistant !
+    Sensor4.setUnitOfMeasurement("sum");
 
     mqtt.begin(BROKER_ADDR, BROKER_USERNAME, BROKER_PASSWORD);
     USBSerial.println("MQTT connected");
@@ -168,6 +179,7 @@ void sendSensorMqtt(){
     Sensor1.setValue(sensorValue1);
     Sensor2.setValue(sensorValue2);
     Sensor3.setValue(sensorValue3);
+    Sensor4.setValue(sensorValue4);
 }
 
 
@@ -181,22 +193,23 @@ void setup() {
 
     USBSerial.begin(19200);
     USBSerial.setDebugOutput(true);       //pour voir les messages de debug des libs sur la console série !
-    delay(3000);  //le temps de passer sur la Serial Monitor ;-)
+    // delay(3000);  //le temps de passer sur la Serial Monitor ;-)
     USBSerial.println("\n\n\n\n**************************************\nCa commence !\n");
 
     //Increment boot number and print it every reboot
     ++bootCount;
+    sensorValue4 = bootCount;
     USBSerial.println("Boot number: " + String(bootCount));
 
     // First we configure the wake up source
     esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
     USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
 
-    digitalWrite(ledPin, HIGH);
+    // digitalWrite(ledPin, HIGH);
     USBSerial.println("Connect WIFI !");
     ConnectWiFi();
-    digitalWrite(ledPin, LOW);
-    delay(500); 
+    // digitalWrite(ledPin, LOW);
+    delay(200); 
 
     USBSerial.println("\n\nConnect MQTT !\n");
     ConnectMQTT();
@@ -206,7 +219,7 @@ void setup() {
     USBSerial.println("\nC'est envoyé !\n");
 
     USBSerial.println("Going to sleep now");
-    delay(1000);
+    delay(200);
     USBSerial.flush(); 
     esp_deep_sleep_start();
     USBSerial.println("This will never be printed");
