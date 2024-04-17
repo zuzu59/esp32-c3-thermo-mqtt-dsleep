@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-// zf240417.1623
+// zf240417.1635
 //
 // Utilisation:
 //
@@ -23,6 +23,7 @@
 // https://www.digikey.fr/fr/resources/conversion-calculators/conversion-calculator-voltage-divider
 // https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
 // https://randomnerdtutorials.com/esp32-deep-sleep-arduino-ide-wake-up-sources/
+// https://randomnerdtutorials.com/esp32-useful-wi-fi-functions-arduino
 //
 
 
@@ -37,6 +38,7 @@ const int buttonPin = 9;  // the number of the pushbutton pin
 int sensorPin = A0;   // select the input pin for battery meter
 float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
 float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
+float sensorValue3 = 0;  // variable to store the value coming from the sensor 3
 
 
 // Deep Sleep
@@ -69,14 +71,22 @@ static void ConnectWiFi() {
     USBSerial.println("\nConnected to the WiFi network");
     USBSerial.print("Local ESP32 IP: ");
     USBSerial.println(WiFi.localIP());
+
+
+    sensorValue3 = WiFi.RSSI();
+    USBSerial.print("RRSI: ");
+    USBSerial.println(sensorValue3);
+
+
 }
 
 
 // MQTT
 #include <ArduinoHA.h>
-#define DEVICE_NAME     "Ti1"
+#define DEVICE_NAME      "Ti1"
 #define SENSOR_NAME1     "Temperature"
 #define SENSOR_NAME2     "Battery"
+#define SENSOR_NAME3     "RSSI"
 
 #define PUBLISH_INTERVAL  1000 // how often image should be published to HA (milliseconds)
 
@@ -88,6 +98,7 @@ unsigned long lastUpdateAt = 0;
 // You should define your own ID.
 HASensorNumber Sensor1(SENSOR_NAME1, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 HASensorNumber Sensor2(SENSOR_NAME2, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
+HASensorNumber Sensor3(SENSOR_NAME3);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 
 static void ConnectMQTT() {
    device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
@@ -101,6 +112,10 @@ static void ConnectMQTT() {
     Sensor2.setIcon("mdi:battery-charging-wireless-outline");
     Sensor2.setName(SENSOR_NAME2);           // c'est le nom du sensor sur Home Assistant !
     Sensor2.setUnitOfMeasurement("V");
+
+    Sensor3.setIcon("mdi:wifi-strength-1");
+    Sensor3.setName(SENSOR_NAME3);           // c'est le nom du sensor sur Home Assistant !
+    Sensor3.setUnitOfMeasurement("dBm");
 
     mqtt.begin(BROKER_ADDR, BROKER_USERNAME, BROKER_PASSWORD);
     USBSerial.println("MQTT connected");
@@ -125,8 +140,6 @@ static void ConnectMQTT() {
   {                                                                                                                    \
     USBSerial.printf(__VA_ARGS__);                                                                                       \
   } while (0)
-
-
 
 
 // Temperature sensor internal initialising
@@ -154,31 +167,8 @@ void sendSensorMqtt(){
     mqtt.loop();
     Sensor1.setValue(sensorValue1);
     Sensor2.setValue(sensorValue2);
+    Sensor3.setValue(sensorValue3);
 }
-
-
-
-void print_wakeup_reason(){
-  esp_sleep_wakeup_cause_t wakeup_reason;
-
-  wakeup_reason = esp_sleep_get_wakeup_cause();
-
-  switch(wakeup_reason)
-  {
-    case ESP_SLEEP_WAKEUP_EXT0 : USBSerial.println("Wakeup caused by external signal using RTC_IO"); break;
-    case ESP_SLEEP_WAKEUP_EXT1 : USBSerial.println("Wakeup caused by external signal using RTC_CNTL"); break;
-    case ESP_SLEEP_WAKEUP_TIMER : USBSerial.println("Wakeup caused by timer"); break;
-    case ESP_SLEEP_WAKEUP_TOUCHPAD : USBSerial.println("Wakeup caused by touchpad"); break;
-    case ESP_SLEEP_WAKEUP_ULP : USBSerial.println("Wakeup caused by ULP program"); break;
-    default : USBSerial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
-  }
-}
-
-
-
-
-
-
 
 
 void setup() {
@@ -198,9 +188,6 @@ void setup() {
     ++bootCount;
     USBSerial.println("Boot number: " + String(bootCount));
 
-    //Print the wakeup reason for ESP32
-    print_wakeup_reason();
-
     // First we configure the wake up source
     esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
     USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
@@ -214,27 +201,15 @@ void setup() {
     USBSerial.println("\n\nConnect MQTT !\n");
     ConnectMQTT();
 
-    USBSerial.println("\nC'est parti !\n");
-
     sendSensorMqtt();
     USBSerial.printf("sensor1: %f,sensor2: %f\n", sensorValue1, sensorValue2);
-
-
-
-
+    USBSerial.println("\nC'est envoyé !\n");
 
     USBSerial.println("Going to sleep now");
     delay(1000);
     USBSerial.flush(); 
     esp_deep_sleep_start();
     USBSerial.println("This will never be printed");
-
-
-
-
-
-
-
 }
 
 
