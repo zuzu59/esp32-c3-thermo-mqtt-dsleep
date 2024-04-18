@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-#define zVERSION "zf240418.1215"
+#define zVERSION "zf240418.1508"
 
 //
 // Utilisation:
@@ -31,6 +31,7 @@
 // https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
 // https://randomnerdtutorials.com/esp32-deep-sleep-arduino-ide-wake-up-sources/
 // https://randomnerdtutorials.com/esp32-useful-wi-fi-functions-arduino
+// https://randomnerdtutorials.com/esp32-ds18b20-temperature-arduino-ide/
 //
 
 
