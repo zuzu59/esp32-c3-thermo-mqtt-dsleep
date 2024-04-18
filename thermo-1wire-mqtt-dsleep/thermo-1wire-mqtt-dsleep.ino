@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-#define zVERSION "zf240418.1508"
+#define zVERSION "zf240418.1643"
 
 //
 // Utilisation:
@@ -32,6 +32,8 @@
 // https://randomnerdtutorials.com/esp32-deep-sleep-arduino-ide-wake-up-sources/
 // https://randomnerdtutorials.com/esp32-useful-wi-fi-functions-arduino
 // https://randomnerdtutorials.com/esp32-ds18b20-temperature-arduino-ide/
+// https://github.com/PaulStoffregen/OneWire
+// https://github.com/milesburton/Arduino-Temperature-Control-Library
 //
 
 
