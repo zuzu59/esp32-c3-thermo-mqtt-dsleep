@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant
 // ATTENTION, ce code a été écrit pour un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION "zf240418.1726"
+#define zVERSION "zf240418.1803"
 
 //
 // Utilisation:
@@ -57,13 +57,14 @@ float sensorValue5 = 0;  // variable to store the value coming from the sensor 5
 
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  5      /* Time ESP32 will go to sleep (in seconds) */
+#define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 
 
 // Temperature sensor DS18B20
 #include <OneWire.h>
 #include <DallasTemperature.h>
+// ATTENTION, c'est le brochage en VCC -> 0 pour le densimètre où il n'y a PAS de mesure de la tension de la batterie !
 const int vccPin = 0;       // the number of the VCC pin
 const int pullupPin = 1;    // the number of the PULLUP pin
 const int oneWireBus = 2;   // GPIO where the DS18B20 is connected to
@@ -81,6 +82,7 @@ DallasTemperature sensors(&oneWire);
 // WIFI
 #include <WiFi.h>
 #include "secrets.h"
+WiFiClient client;
 
 static void ConnectWiFi() {
     USBSerial.printf("WIFI_SSID: %s\nWIFI_PASSWORD: %s\n", WIFI_SSID, WIFI_PASSWORD);
@@ -98,7 +100,6 @@ static void ConnectWiFi() {
     USBSerial.println("\nConnected to the WiFi network");
     USBSerial.print("Local ESP32 IP: ");
     USBSerial.println(WiFi.localIP());
-
     sensorValue3 = WiFi.RSSI();
     USBSerial.print("RRSI: ");
     USBSerial.println(sensorValue3);
@@ -108,24 +109,22 @@ static void ConnectWiFi() {
 // MQTT
 #include <ArduinoHA.h>
 #define DEVICE_NAME      "thow3"
-#define SENSOR_NAME1     "Temperature Internal"
+#define SENSOR_NAME1     "Temp_Internal"
 #define SENSOR_NAME2     "Battery"
 #define SENSOR_NAME3     "RSSI"
 #define SENSOR_NAME4     "bootCount"
-#define SENSOR_NAME5     "Temperature DS18B20"
+#define SENSOR_NAME5     "Temp_DS18B20"
 
-
-WiFiClient client;
 HADevice device(DEVICE_NAME);                // c'est le ID du device, il doit être unique !
 HAMqtt mqtt(client, device);
 unsigned long lastUpdateAt = 0;
 
 // c'est le ID du sensor, il doit être unique !
-HASensorNumber Sensor1(DEVICE_NAME SENSOR_NAME1, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
+HASensorNumber Sensor1(DEVICE_NAME SENSOR_NAME1, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 HASensorNumber Sensor2(DEVICE_NAME SENSOR_NAME2, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 HASensorNumber Sensor3(DEVICE_NAME SENSOR_NAME3);   // c'est le nom du sensor sur MQTT !
 HASensorNumber Sensor4(DEVICE_NAME SENSOR_NAME4);   // c'est le nom du sensor sur MQTT !
-HASensorNumber Sensor5(DEVICE_NAME SENSOR_NAME5, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
+HASensorNumber Sensor5(DEVICE_NAME SENSOR_NAME5, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 
 static void ConnectMQTT() {
     device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
@@ -188,9 +187,6 @@ void initTempSensor(){
 }
 
 
-
-
-
 // Temperature sensor DS18B20 initialising
 void initDS18B20Sensor(){
     pinMode(gndPin, OUTPUT);   // gnd
@@ -203,28 +199,19 @@ void initDS18B20Sensor(){
 }
 
 
-
-
-
-
-
-
 // Lit les senseurs
 void readSensor(){
+    // lit la température interne
     temp_sensor_read_celsius(&sensorValue1);
-    // fonction de conversion bit to volts de l'ADC avec le diviseur résistif et de la diode !
-    // voir https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
-    // 0.001034 * (ADC - 2380) + 3.6
-    uint16_t reading = analogRead(sensorPin);
-    sensorValue2 = 0.001034 * (reading - 2380) + 3.6;            // 2960 pour 4.2V et 2380 pour 3.6V
-
+    // // lit la tension de la batterie
+    // uint16_t reading = analogRead(sensorPin);
+    // // fonction de conversion bit to volts de l'ADC avec le diviseur résistif et de la diode !
+    // // voir https://raw.githubusercontent.com/zuzu59/esp32-c3-thermo-mqtt-dsleep/master/fonction_conversion_ADC.txt
+    // // 0.001034 * (ADC - 2380) + 3.6
+    // sensorValue2 = 0.001034 * (reading - 2380) + 3.6;            // 2960 pour 4.2V et 2380 pour 3.6V
+    // lit la température du DS18B20
     sensors.requestTemperatures(); 
     sensorValue5 = sensors.getTempCByIndex(0);
-
-
-
-
-
 }
 
 
@@ -246,7 +233,7 @@ void setup() {
     // Il faut lire la température tout de suite au début avant que le MCU ne puisse chauffer !
     initTempSensor();
     initDS18B20Sensor();
-
+    delay(200);
     readSensor();
 
     USBSerial.begin(19200);
@@ -285,5 +272,8 @@ void setup() {
 
 
 void loop() {
+    readSensor();
+    USBSerial.printf("sensor1:%f,sensor2:%f,sensor5:%f\n", sensorValue1, sensorValue2, sensorValue5);
+    delay(2000);
 }
 
