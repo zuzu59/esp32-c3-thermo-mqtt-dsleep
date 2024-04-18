@@ -1,9 +1,9 @@
-// Juste un test de faire un thermomètre enregistreur un capteur 
-// o-wire DS18B20 avec un esp32-c3-super-mini
+// Juste un test pour faire un thermomètre enregistreur avec un capteur 
+// 1-wire DS18B20 avec un esp32-c3-super-mini
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant
-// ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
+// ATTENTION, ce code a été écrit pour un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION "zf240418.1643"
+#define zVERSION "zf240418.1726"
 
 //
 // Utilisation:
@@ -18,9 +18,13 @@
 // 
 // Il faut disabled USB CDC On Boot et utiliser USBSerial. au lieu de Serial. pour la console !
 //
-// Il faut installer cette lib pour le senseur de température interne
+// Pour le senseur de température interne il faut installer cette lib:
 // https://github.com/espressif/esp-idf/blob/master/components/driver/test_apps/legacy_rtc_temp_driver/main/test_rtc_temp_driver.c
-
+//
+// Pour le senseur DS18B20 il faut installer ces lib: 
+// https://github.com/PaulStoffregen/OneWire
+// https://github.com/milesburton/Arduino-Temperature-Control-Library
+//
 // Pour MQTT, il faut installer la lib (home-assistant-integration):
 // https://github.com/dawidchyrzynski/arduino-home-assistant
 //
@@ -32,8 +36,6 @@
 // https://randomnerdtutorials.com/esp32-deep-sleep-arduino-ide-wake-up-sources/
 // https://randomnerdtutorials.com/esp32-useful-wi-fi-functions-arduino
 // https://randomnerdtutorials.com/esp32-ds18b20-temperature-arduino-ide/
-// https://github.com/PaulStoffregen/OneWire
-// https://github.com/milesburton/Arduino-Temperature-Control-Library
 //
 
 
@@ -49,13 +51,27 @@ int sensorPin = A0;   // select the input pin for battery meter
 float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
 float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
 float sensorValue3 = 0;  // variable to store the value coming from the sensor 3
-float sensorValue4 = 0;  // variable to store the value coming from the sensor 3
+float sensorValue4 = 0;  // variable to store the value coming from the sensor 4
+float sensorValue5 = 0;  // variable to store the value coming from the sensor 5
 
 
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  5      /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
+
+
+// Temperature sensor DS18B20
+#include <OneWire.h>
+#include <DallasTemperature.h>
+const int vccPin = 0;       // the number of the VCC pin
+const int pullupPin = 1;    // the number of the PULLUP pin
+const int oneWireBus = 2;   // GPIO where the DS18B20 is connected to
+const int gndPin = 3;       // the number of the GND pin
+// Setup a oneWire instance to communicate with any OneWire devices
+OneWire oneWire(oneWireBus);
+// Pass our oneWire reference to Dallas Temperature sensor 
+DallasTemperature sensors(&oneWire);
 
 
 // Temperature sensor internal
@@ -83,22 +99,21 @@ static void ConnectWiFi() {
     USBSerial.print("Local ESP32 IP: ");
     USBSerial.println(WiFi.localIP());
 
-
     sensorValue3 = WiFi.RSSI();
     USBSerial.print("RRSI: ");
     USBSerial.println(sensorValue3);
-
-
 }
 
 
 // MQTT
 #include <ArduinoHA.h>
-#define DEVICE_NAME      "thi3"
-#define SENSOR_NAME1     "Temperature"
+#define DEVICE_NAME      "thow3"
+#define SENSOR_NAME1     "Temperature Internal"
 #define SENSOR_NAME2     "Battery"
 #define SENSOR_NAME3     "RSSI"
 #define SENSOR_NAME4     "bootCount"
+#define SENSOR_NAME5     "Temperature DS18B20"
+
 
 WiFiClient client;
 HADevice device(DEVICE_NAME);                // c'est le ID du device, il doit être unique !
@@ -110,6 +125,7 @@ HASensorNumber Sensor1(DEVICE_NAME SENSOR_NAME1, HASensorNumber::PrecisionP2);  
 HASensorNumber Sensor2(DEVICE_NAME SENSOR_NAME2, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 HASensorNumber Sensor3(DEVICE_NAME SENSOR_NAME3);   // c'est le nom du sensor sur MQTT !
 HASensorNumber Sensor4(DEVICE_NAME SENSOR_NAME4);   // c'est le nom du sensor sur MQTT !
+HASensorNumber Sensor5(DEVICE_NAME SENSOR_NAME5, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 
 static void ConnectMQTT() {
     device.setName(DEVICE_NAME);                // c'est le nom du device sur Home Assistant !
@@ -133,6 +149,10 @@ static void ConnectMQTT() {
     Sensor4.setIcon("mdi:counter");
     Sensor4.setName(SENSOR_NAME4);           // c'est le nom du sensor sur Home Assistant !
     Sensor4.setUnitOfMeasurement("sum");
+
+    Sensor5.setIcon("mdi:thermometer");
+    Sensor5.setName(SENSOR_NAME5);           // c'est le nom du sensor sur Home Assistant !
+    Sensor5.setUnitOfMeasurement("°C");
 
     mqtt.begin(BROKER_ADDR, BROKER_USERNAME, BROKER_PASSWORD);
     USBSerial.println("MQTT connected");
@@ -168,6 +188,27 @@ void initTempSensor(){
 }
 
 
+
+
+
+// Temperature sensor DS18B20 initialising
+void initDS18B20Sensor(){
+    pinMode(gndPin, OUTPUT);   // gnd
+    digitalWrite(gndPin, LOW);
+    pinMode(pullupPin, INPUT_PULLUP);   // pull up
+    pinMode(vccPin, OUTPUT );   // vcc
+    digitalWrite(vccPin, HIGH);
+    // Start the DS18B20 sensor
+    sensors.begin();
+}
+
+
+
+
+
+
+
+
 // Lit les senseurs
 void readSensor(){
     temp_sensor_read_celsius(&sensorValue1);
@@ -176,6 +217,14 @@ void readSensor(){
     // 0.001034 * (ADC - 2380) + 3.6
     uint16_t reading = analogRead(sensorPin);
     sensorValue2 = 0.001034 * (reading - 2380) + 3.6;            // 2960 pour 4.2V et 2380 pour 3.6V
+
+    sensors.requestTemperatures(); 
+    sensorValue5 = sensors.getTempCByIndex(0);
+
+
+
+
+
 }
 
 
@@ -186,6 +235,7 @@ void sendSensorMqtt(){
     Sensor2.setValue(sensorValue2);
     Sensor3.setValue(sensorValue3);
     Sensor4.setValue(sensorValue4);
+    Sensor5.setValue(sensorValue5);
 }
 
 
@@ -195,6 +245,8 @@ void setup() {
 
     // Il faut lire la température tout de suite au début avant que le MCU ne puisse chauffer !
     initTempSensor();
+    initDS18B20Sensor();
+
     readSensor();
 
     USBSerial.begin(19200);
@@ -221,7 +273,7 @@ void setup() {
     ConnectMQTT();
 
     sendSensorMqtt();
-    USBSerial.printf("sensor1: %f,sensor2: %f\n", sensorValue1, sensorValue2);
+    USBSerial.printf("sensor1:%f,sensor2:%f,sensor5:%f\n", sensorValue1, sensorValue2, sensorValue5);
     USBSerial.println("\nC'est envoyé !\n");
 
     USBSerial.println("Going to sleep now");
