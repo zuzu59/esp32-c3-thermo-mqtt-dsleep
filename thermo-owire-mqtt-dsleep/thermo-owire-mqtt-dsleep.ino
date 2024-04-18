@@ -1,16 +1,18 @@
-// Juste un test de faire un thermomètre enregistreur très minimaliste avec le capteur 
-// de température interne d'un esp32-c3-super-mini
-// Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
+// Juste un test de faire un thermomètre enregistreur un capteur 
+// o-wire DS18B20 avec un esp32-c3-super-mini
+// Envoie aussi le résultat des senseurs sur le mqtt pour home assistant
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-#define zVERSION "zf240418.0909"
-
-
-// il faut ajouter dans le mqtt le nombre de boot !
-
+#define zVERSION "zf240418.1215"
 
 //
 // Utilisation:
+//
+// Astuce:
+// Afin d'économiser la résistance et de simplifier au maximum le câblage, 
+// j'utilise la pull up interne de l'esp32-c3 comme pull up et les deux pins 
+// adjacentes pour la masse et l'alimentation pour le DS18B20. Il faudra 
+// donc configurer ces pins en conséquence !
 //
 // Installation:
 // 

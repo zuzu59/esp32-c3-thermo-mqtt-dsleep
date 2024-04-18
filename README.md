@@ -1,7 +1,7 @@
 # esp32-c3-thermo-mqtt-dsleep
 Juste un test de faire un thermomètre enregistreur très minimaliste avec le capteur de température interne d'un esp32-c3-super-mini
 
-zf240416.1646
+zf240418.1201
 
 ## Buts
 Simplement faire un thermomètre enregistreur très minimaliste avec le capteur de température interne d'un esp32-c3-super-mini
@@ -20,6 +20,8 @@ J'ai utilisé pour ce projet un esp32-c3 super mini
 https://grabcad.com/library/esp32-c3-supermini-1
 
 https://fr.aliexpress.com/item/1005006170575141.html
+
+https://www.studiopieters.nl/esp32-c3-pinout/
 
 
 ## Sources
