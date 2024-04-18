@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-#define zVERSION "zf240417.0044"
+#define zVERSION "zf240418.0909"
 
 
 // il faut ajouter dans le mqtt le nombre de boot !
@@ -49,7 +49,7 @@ float sensorValue4 = 0;  // variable to store the value coming from the sensor 3
 
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
+#define TIME_TO_SLEEP  5      /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 
 
@@ -89,7 +89,7 @@ static void ConnectWiFi() {
 
 // MQTT
 #include <ArduinoHA.h>
-#define DEVICE_NAME      "thi1"
+#define DEVICE_NAME      "thi3"
 #define SENSOR_NAME1     "Temperature"
 #define SENSOR_NAME2     "Battery"
 #define SENSOR_NAME3     "RSSI"
@@ -101,7 +101,7 @@ HAMqtt mqtt(client, device);
 unsigned long lastUpdateAt = 0;
 
 // c'est le ID du sensor, il doit être unique !
-HASensorNumber Sensor1(DEVICE_NAME SENSOR_NAME1, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
+HASensorNumber Sensor1(DEVICE_NAME SENSOR_NAME1, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 HASensorNumber Sensor2(DEVICE_NAME SENSOR_NAME2, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 HASensorNumber Sensor3(DEVICE_NAME SENSOR_NAME3);   // c'est le nom du sensor sur MQTT !
 HASensorNumber Sensor4(DEVICE_NAME SENSOR_NAME4);   // c'est le nom du sensor sur MQTT !
