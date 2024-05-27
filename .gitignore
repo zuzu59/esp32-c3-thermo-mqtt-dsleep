@@ -1,5 +1,6 @@
+.DS_Store*
 secrets.h
-.DS_Store
+build*
 
 
 # Prerequisites

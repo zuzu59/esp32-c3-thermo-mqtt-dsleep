@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant
 // ATTENTION, ce code a été écrit pour un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION "zf240418.1803"
+#define zVERSION "zf240526.1138"
 
 //
 // Utilisation:
@@ -263,16 +263,17 @@ void setup() {
     USBSerial.printf("sensor1:%f,sensor2:%f,sensor5:%f\n", sensorValue1, sensorValue2, sensorValue5);
     USBSerial.println("\nC'est envoyé !\n");
 
-    USBSerial.println("Going to sleep now");
-    delay(200);
-    USBSerial.flush(); 
-    esp_deep_sleep_start();
-    USBSerial.println("This will never be printed");
+    // USBSerial.println("Going to sleep now");
+    // delay(200);
+    // USBSerial.flush(); 
+    // esp_deep_sleep_start();
+    // USBSerial.println("This will never be printed");
 }
 
 
 void loop() {
     readSensor();
+    sendSensorMqtt();
     USBSerial.printf("sensor1:%f,sensor2:%f,sensor5:%f\n", sensorValue1, sensorValue2, sensorValue5);
     delay(2000);
 }

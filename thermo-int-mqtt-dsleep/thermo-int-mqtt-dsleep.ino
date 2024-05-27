@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant (pas en fonction actuellement !)
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres bords !
 //
-#define zVERSION "zf240418.0909"
+#define zVERSION "zf240527.1747"
 
 
 // il faut ajouter dans le mqtt le nombre de boot !
@@ -49,7 +49,7 @@ float sensorValue4 = 0;  // variable to store the value coming from the sensor 3
 
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  5      /* Time ESP32 will go to sleep (in seconds) */
+#define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 
 
