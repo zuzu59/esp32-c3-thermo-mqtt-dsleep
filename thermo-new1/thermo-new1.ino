@@ -3,7 +3,7 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION  "zf240528.2354"
+#define zVERSION  "zf240529.0004"
 #define zHOST     "thi4"            // ATTENTION, tout en minuscule !
 
 /*
@@ -131,12 +131,12 @@ void setup() {
   zEnvoieTouteLaSauce();
   USBSerial.println("\nC'est envoyé !\n");
 
-  // // On va dormir !
-  // USBSerial.println("Going to sleep now");
-  // delay(200);
-  // USBSerial.flush(); 
-  // esp_deep_sleep_start();
-  // USBSerial.println("This will never be printed");
+  // On va dormir !
+  USBSerial.println("Going to sleep now");
+  delay(200);
+  USBSerial.flush(); 
+  esp_deep_sleep_start();
+  USBSerial.println("This will never be printed");
 }
 
 
