@@ -3,8 +3,8 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION  "zf240527.1808"
-#define zHOST     "thi2"            // ATTENTION, tout en minuscule !
+#define zVERSION  "zf240528.2354"
+#define zHOST     "thi4"            // ATTENTION, tout en minuscule !
 
 /*
 Utilisation:
@@ -38,13 +38,9 @@ https://forum.fritzing.org/t/need-esp32-c3-super-mini-board-model/20561
 https://www.aliexpress.com/item/1005006005040320.html
 https://randomnerdtutorials.com/esp32-useful-wi-fi-functions-arduino
 https://dronebotworkshop.com/wifimanager/
-https://github.com/universam1/iSpindel/tree/master
-https://components101.com/sensors/mpu6050-module
-https://github.com/electroniccats/mpu6050
-https://github.com/ElectronicCats/mpu6050/blob/master/examples/MPU6050_raw/MPU6050_raw.ino
 https://lastminuteengineers.com/esp32-ota-web-updater-arduino-ide/
 https://github.com/dawidchyrzynski/arduino-home-assistant/blob/main/examples/sensor-integer/sensor-integer.ino
-https://chat.mistral.ai/    pour toute la partie API REST ᕗ
+https://chat.mistral.ai/    pour toute la partie API REST et wifiAuto ᕗ
 */
 
 
@@ -56,30 +52,17 @@ https://chat.mistral.ai/    pour toute la partie API REST ᕗ
 
 
 // General
-const int ledPin = 8;    // the number of the LED pin
-const int buttonPin = 9;  // the number of the pushbutton pin
-float rrsiLevel = 0;      // variable to store the RRSI level
-const int zSonarPulseOn = 50;    // délai pour sonarPulse
-const int zSonarPulseOff = 100;    // délai pour sonarPulse
-const int zSonarPulseWait = 500;    // délai pour sonarPulse
-byte zSonarPulseState = 1;    // état pour sonarPulse
-long zSonarPulseNextMillis = 0;    // état pour sonarPulse
+const int ledPin = 8;             // the number of the LED pin
+const int buttonPin = 9;          // the number of the pushbutton pin
+int zDelay1Interval = 60000;       // Délais en mili secondes pour le zDelay1
 
 
-float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
-float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
-float sensorValue3 = 0;  // variable to store the value coming from the sensor 3
-float sensorValue4 = 0;  // variable to store the value coming from the sensor 4
-float sensorValue5 = 0;  // variable to store the value coming from the sensor 5
-#define TEMP_CELSIUS 0
-
-
-// Solar Pulse
-#include "zsolarpulse.h"
+// Sonar Pulse
+#include "zSonarpulse.h"
 
 
 // WIFI
-#include "zwifi.h"
+#include "zWifi.h"
 
 
 // OTA WEB server
@@ -87,11 +70,11 @@ float sensorValue5 = 0;  // variable to store the value coming from the sensor 5
 
 
 // MQTT
-#include "zmqtt.h"
+#include "zMqtt.h"
 
 
 // Temperature sensor
-#include "ztemperature.h"
+#include "zTemperature.h"
 
 
 // Deep Sleep
@@ -121,14 +104,6 @@ void setup() {
   delay(3000);                          //le temps de passer sur la Serial Monitor ;-)
   USBSerial.println("\n\n\n\n**************************************\nCa commence !"); USBSerial.println(zHOST ", " zVERSION);
 
-  // si le bouton FLASH de l'esp32-c3 est appuyé dans les 3 secondes après le boot, la config WIFI sera effacée !
-  pinMode(buttonPin, INPUT_PULLUP);
-  if ( digitalRead(buttonPin) == LOW) {
-    WiFiManager wm; wm.resetSettings();
-    USBSerial.println("Config WIFI effacée !"); delay(1000);
-    ESP.restart();
-  }
-
   //Increment boot number and print it every reboot
   ++bootCount;
   sensorValue4 = bootCount;
@@ -156,12 +131,12 @@ void setup() {
   zEnvoieTouteLaSauce();
   USBSerial.println("\nC'est envoyé !\n");
 
-  // On va dormir !
-  USBSerial.println("Going to sleep now");
-  delay(200);
-  USBSerial.flush(); 
-  esp_deep_sleep_start();
-  USBSerial.println("This will never be printed");
+  // // On va dormir !
+  // USBSerial.println("Going to sleep now");
+  // delay(200);
+  // USBSerial.flush(); 
+  // esp_deep_sleep_start();
+  // USBSerial.println("This will never be printed");
 }
 
 
@@ -170,7 +145,7 @@ void loop() {
   zEnvoieTouteLaSauce();
 
   // Délais non bloquant pour le sonarpulse et l'OTA
-  zDelay1(PUBLISH_INTERVAL);
+  zDelay1(zDelay1Interval);
 }
 
 
