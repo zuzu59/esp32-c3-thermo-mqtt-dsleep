@@ -3,7 +3,7 @@
 // Envoie aussi le résultat des senseurs sur le mqtt pour home assistant
 // ATTENTION, ce code a été écrit pour un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION "zf240526.1138"
+#define zVERSION "zf240529.2306"
 
 //
 // Utilisation:
@@ -65,10 +65,15 @@ RTC_DATA_ATTR int bootCount = 0;
 #include <OneWire.h>
 #include <DallasTemperature.h>
 // ATTENTION, c'est le brochage en VCC -> 0 pour le densimètre où il n'y a PAS de mesure de la tension de la batterie !
-const int vccPin = 0;       // the number of the VCC pin
-const int pullupPin = 1;    // the number of the PULLUP pin
-const int oneWireBus = 2;   // GPIO where the DS18B20 is connected to
-const int gndPin = 3;       // the number of the GND pin
+// const int vccPin = 0;       // the number of the VCC pin
+// const int pullupPin = 1;    // the number of the PULLUP pin
+// const int oneWireBus = 2;   // GPIO where the DS18B20 is connected to
+// const int gndPin = 3;       // the number of the GND pin
+// ATTENTION, c'est le brochage en VCC -> 1 pour le densimètre où il n'y a une mesure de la tension de la batterie !
+const int vccPin = 1;       // the number of the VCC pin
+const int pullupPin = 2;    // the number of the PULLUP pin
+const int oneWireBus = 3;   // GPIO where the DS18B20 is connected to
+const int gndPin = 4;       // the number of the GND pin
 // Setup a oneWire instance to communicate with any OneWire devices
 OneWire oneWire(oneWireBus);
 // Pass our oneWire reference to Dallas Temperature sensor 
