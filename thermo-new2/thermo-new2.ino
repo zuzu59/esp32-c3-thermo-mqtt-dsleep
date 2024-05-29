@@ -5,7 +5,7 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION  "zf240529.1945"
+#define zVERSION  "zf240529.2310"
 #define zHOST     "thi4"            // ATTENTION, tout en minuscule !
 
 /*
@@ -39,7 +39,7 @@ Pour JSON, il faut installer cette lib:
 https://github.com/bblanchon/ArduinoJson
 
 Sources:
-https://www.espboards.dev/blog/esp32-inbuilt-temperature-sensor
+https://www.reddit.com/r/esp32/comments/1crwakg/built_in_temperature_sensor_on_esp32c3_red_as/?rdt=63263
 https://forum.fritzing.org/t/need-esp32-c3-super-mini-board-model/20561
 https://www.aliexpress.com/item/1005006005040320.html
 https://randomnerdtutorials.com/esp32-useful-wi-fi-functions-arduino
@@ -86,7 +86,7 @@ int zDelay1Interval = 60000;       // Délais en mili secondes pour le zDelay1
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 // #define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
-#define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
+#define TIME_TO_SLEEP  120      /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 
 
@@ -97,18 +97,17 @@ void setup() {
   digitalWrite(ledPin, LOW); delay(zSonarPulseOn); digitalWrite(ledPin, HIGH); delay(zSonarPulseOff);
   delay(zSonarPulseWait);
 
-  // Il faut lire la température tout de suite au début avant que le MCU ne puisse chauffer !
-  // initTempSensor();
-  initTempSensor();
-  initDS18B20Sensor();
-  delay(200);
-  readSensor();
-
   // start serial console
   USBSerial.begin(19200);
   USBSerial.setDebugOutput(true);       //pour voir les messages de debug des libs sur la console série !
   delay(3000);                          //le temps de passer sur la Serial Monitor ;-)
   USBSerial.println("\n\n\n\n**************************************\nCa commence !"); USBSerial.println(zHOST ", " zVERSION);
+
+  // Il faut lire la température tout de suite au début avant que le MCU ne puisse chauffer !
+  initTempSensor();
+  initDS18B20Sensor();
+  delay(200);
+  readSensor();
 
   //Increment boot number and print it every reboot
   ++bootCount;
@@ -126,9 +125,9 @@ void setup() {
   // start OTA server
   otaWebServer();
 
-  // // Connexion au MQTT
-  // USBSerial.println("\n\nConnect MQTT !\n");
-  // ConnectMQTT();
+  // Connexion au MQTT
+  USBSerial.println("\n\nConnect MQTT !\n");
+  ConnectMQTT();
 
   // go go go
   USBSerial.println("\nC'est parti !\n");
@@ -137,12 +136,12 @@ void setup() {
   zEnvoieTouteLaSauce();
   USBSerial.println("\nC'est envoyé !\n");
 
-  // // On va dormir !
-  // USBSerial.println("Going to sleep now");
-  // delay(200);
-  // USBSerial.flush(); 
-  // esp_deep_sleep_start();
-  // USBSerial.println("This will never be printed");
+  // On va dormir !
+  USBSerial.println("Going to sleep now");
+  delay(200);
+  USBSerial.flush(); 
+  esp_deep_sleep_start();
+  USBSerial.println("This will never be printed");
 }
 
 
@@ -161,8 +160,8 @@ void zEnvoieTouteLaSauce(){
   // Lit les températures
   readSensor();
 
-  // // Envoie les mesures au MQTT
-  // sendSensorMqtt();
+  // Envoie les mesures au MQTT
+  sendSensorMqtt();
 
   // Graphe sur l'Arduino IDE les courbes des mesures
   USBSerial.print("sensor1:");
