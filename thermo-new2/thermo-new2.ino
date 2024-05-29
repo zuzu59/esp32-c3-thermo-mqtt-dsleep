@@ -5,7 +5,7 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION  "zf240529.2310"
+#define zVERSION  "zf240529.2344"
 #define zHOST     "thi4"            // ATTENTION, tout en minuscule !
 
 /*
@@ -86,11 +86,17 @@ int zDelay1Interval = 60000;       // Délais en mili secondes pour le zDelay1
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 // #define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
-#define TIME_TO_SLEEP  120      /* Time ESP32 will go to sleep (in seconds) */
+#define TIME_TO_SLEEP  180      /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 
 
 void setup() {
+  // Il faut lire la température tout de suite au début avant que le MCU ne puisse chauffer !
+  // initTempSensor();
+  initDS18B20Sensor();
+  delay(200);
+  readSensor();
+
   // Pulse deux fois pour dire que l'on démarre
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW); delay(zSonarPulseOn); digitalWrite(ledPin, HIGH); delay(zSonarPulseOff);
@@ -103,11 +109,7 @@ void setup() {
   delay(3000);                          //le temps de passer sur la Serial Monitor ;-)
   USBSerial.println("\n\n\n\n**************************************\nCa commence !"); USBSerial.println(zHOST ", " zVERSION);
 
-  // Il faut lire la température tout de suite au début avant que le MCU ne puisse chauffer !
-  initTempSensor();
-  initDS18B20Sensor();
-  delay(200);
-  readSensor();
+
 
   //Increment boot number and print it every reboot
   ++bootCount;
