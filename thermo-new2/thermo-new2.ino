@@ -1,9 +1,11 @@
+// Nouvelle version pour tester une autre façon de lire le capteur de température interne du esp32-c3
+
 // Petit thermomètre enregistreur avec deux sondes de température, une interne au esp32-c3 
 // et une externe avec un 1-wire DS18B20 avec un esp32-c3-super-mini
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION  "zf240529.2019"
+#define zVERSION  "zf240529.1945"
 #define zHOST     "thi4"            // ATTENTION, tout en minuscule !
 
 /*
@@ -124,9 +126,9 @@ void setup() {
   // start OTA server
   otaWebServer();
 
-  // Connexion au MQTT
-  USBSerial.println("\n\nConnect MQTT !\n");
-  ConnectMQTT();
+  // // Connexion au MQTT
+  // USBSerial.println("\n\nConnect MQTT !\n");
+  // ConnectMQTT();
 
   // go go go
   USBSerial.println("\nC'est parti !\n");
@@ -135,12 +137,12 @@ void setup() {
   zEnvoieTouteLaSauce();
   USBSerial.println("\nC'est envoyé !\n");
 
-  // On va dormir !
-  USBSerial.println("Going to sleep now");
-  delay(200);
-  USBSerial.flush(); 
-  esp_deep_sleep_start();
-  USBSerial.println("This will never be printed");
+  // // On va dormir !
+  // USBSerial.println("Going to sleep now");
+  // delay(200);
+  // USBSerial.flush(); 
+  // esp_deep_sleep_start();
+  // USBSerial.println("This will never be printed");
 }
 
 
@@ -159,8 +161,8 @@ void zEnvoieTouteLaSauce(){
   // Lit les températures
   readSensor();
 
-  // Envoie les mesures au MQTT
-  sendSensorMqtt();
+  // // Envoie les mesures au MQTT
+  // sendSensorMqtt();
 
   // Graphe sur l'Arduino IDE les courbes des mesures
   USBSerial.print("sensor1:");
