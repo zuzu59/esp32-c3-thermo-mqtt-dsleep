@@ -62,7 +62,7 @@ void readSensor(){
     // temp_sensor_read_celsius(&sensorValue1);
     sensorValue1 = temperatureRead();
 
-    // sensorValue1 = sensorValue1 - 5.5;        // Enlève 6° de trop, je ne sais pas pourquoi ? zf240526.1142
+    sensorValue1 = sensorValue1 - 12;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
 
     // lit la température du DS18B20
     sensors.requestTemperatures(); 

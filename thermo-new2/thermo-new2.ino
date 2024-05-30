@@ -5,8 +5,8 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION  "zf240529.2344"
-#define zHOST     "thi4"            // ATTENTION, tout en minuscule !
+#define zVERSION  "zf240530.0907"
+#define zHOST     "thi3"            // ATTENTION, tout en minuscule !
 
 /*
 Utilisation:
@@ -86,7 +86,7 @@ int zDelay1Interval = 60000;       // Délais en mili secondes pour le zDelay1
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 // #define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
-#define TIME_TO_SLEEP  180      /* Time ESP32 will go to sleep (in seconds) */
+#define TIME_TO_SLEEP  60      /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 
 
