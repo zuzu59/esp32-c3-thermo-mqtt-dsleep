@@ -5,8 +5,8 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION  "zf240530.0907"
-#define zHOST     "thi3"            // ATTENTION, tout en minuscule !
+#define zVERSION  "zf240531.1732"
+#define zHOST     "thi1"            // ATTENTION, tout en minuscule !
 
 /*
 Utilisation:
@@ -92,7 +92,6 @@ RTC_DATA_ATTR int bootCount = 0;
 
 void setup() {
   // Il faut lire la température tout de suite au début avant que le MCU ne puisse chauffer !
-  // initTempSensor();
   initDS18B20Sensor();
   delay(200);
   readSensor();
@@ -103,28 +102,26 @@ void setup() {
   digitalWrite(ledPin, LOW); delay(zSonarPulseOn); digitalWrite(ledPin, HIGH); delay(zSonarPulseOff);
   delay(zSonarPulseWait);
 
-  // start serial console
+  // Start serial console
   USBSerial.begin(19200);
   USBSerial.setDebugOutput(true);       //pour voir les messages de debug des libs sur la console série !
   delay(3000);                          //le temps de passer sur la Serial Monitor ;-)
   USBSerial.println("\n\n\n\n**************************************\nCa commence !"); USBSerial.println(zHOST ", " zVERSION);
-
-
 
   //Increment boot number and print it every reboot
   ++bootCount;
   sensorValue4 = bootCount;
   USBSerial.println("Boot number: " + String(bootCount));
 
-  // First we configure the wake up source
+  // Configuration du dsleep
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
 
-  // start WIFI
+  // Start WIFI
   zStartWifi();
   sensorValue3 = WiFi.RSSI();
 
-  // start OTA server
+  // Start OTA server
   otaWebServer();
 
   // Connexion au MQTT
@@ -138,12 +135,13 @@ void setup() {
   zEnvoieTouteLaSauce();
   USBSerial.println("\nC'est envoyé !\n");
 
-  // On va dormir !
-  USBSerial.println("Going to sleep now");
-  delay(200);
-  USBSerial.flush(); 
-  esp_deep_sleep_start();
-  USBSerial.println("This will never be printed");
+  // // Partie dsleep. On va dormir !
+  // USBSerial.println("Going to sleep now");
+  // delay(200);
+  // USBSerial.flush(); 
+  // esp_deep_sleep_start();
+  // USBSerial.println("This will never be printed");
+
 }
 
 
