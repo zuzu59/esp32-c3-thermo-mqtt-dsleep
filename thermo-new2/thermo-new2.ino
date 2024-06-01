@@ -5,7 +5,7 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION  "zf240531.1732"
+#define zVERSION  "zf240531.1822"
 #define zHOST     "thi1"            // ATTENTION, tout en minuscule !
 
 /*
@@ -86,7 +86,7 @@ int zDelay1Interval = 60000;       // Délais en mili secondes pour le zDelay1
 // Deep Sleep
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 // #define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
-#define TIME_TO_SLEEP  60      /* Time ESP32 will go to sleep (in seconds) */
+#define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 
 
@@ -135,12 +135,12 @@ void setup() {
   zEnvoieTouteLaSauce();
   USBSerial.println("\nC'est envoyé !\n");
 
-  // // Partie dsleep. On va dormir !
-  // USBSerial.println("Going to sleep now");
-  // delay(200);
-  // USBSerial.flush(); 
-  // esp_deep_sleep_start();
-  // USBSerial.println("This will never be printed");
+  // Partie dsleep. On va dormir !
+  USBSerial.println("Going to sleep now");
+  delay(200);
+  USBSerial.flush(); 
+  esp_deep_sleep_start();
+  USBSerial.println("This will never be printed");
 
 }
 
