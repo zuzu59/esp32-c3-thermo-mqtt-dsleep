@@ -6,7 +6,7 @@
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres boards !
 //
 #define zVERSION        "zf240606.1603"
-#define zHOST           "thi4"              // ATTENTION, tout en minuscule
+#define zHOST           "thi5"              // ATTENTION, tout en minuscule
 #define zDSLEEP         true                // true ou false
 #define TIME_TO_SLEEP   300                 // dSleep en secondes 
 int zDelay1Interval =   60000;              // Délais en mili secondes pour la boucle loop

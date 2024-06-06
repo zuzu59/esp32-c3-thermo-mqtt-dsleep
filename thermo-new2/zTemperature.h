@@ -1,4 +1,4 @@
-// zf240531.1732
+// zf240606.1705
 
 // Temperature sensor DS18B20
 #include <OneWire.h>
@@ -35,7 +35,7 @@ void initDS18B20Sensor(){
 void readSensor(){
     // lit la température interne
     sensorValue1 = temperatureRead();
-    sensorValue1 = sensorValue1 - 12;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
+    sensorValue1 = sensorValue1 - 10.5;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
     // lit la température du DS18B20
     sensors.requestTemperatures(); 
     sensorValue5 = sensors.getTempCByIndex(0);
