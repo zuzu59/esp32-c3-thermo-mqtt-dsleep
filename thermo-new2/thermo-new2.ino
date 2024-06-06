@@ -3,10 +3,13 @@
 // Petit thermomètre enregistreur avec deux sondes de température, une interne au esp32-c3 
 // et une externe avec un 1-wire DS18B20 avec un esp32-c3-super-mini
 //
-// ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
+// ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION  "zf240603.1124"
-#define zHOST     "thi5"            // ATTENTION, tout en minuscule !
+#define zVERSION        "zf240606.1603"
+#define zHOST           "thi4"              // ATTENTION, tout en minuscule
+#define zDSLEEP         true                // true ou false
+#define TIME_TO_SLEEP   300                 // dSleep en secondes 
+int zDelay1Interval =   60000;              // Délais en mili secondes pour la boucle loop
 
 /*
 Utilisation:
@@ -60,7 +63,6 @@ https://chat.mistral.ai/    pour toute la partie API REST et wifiAuto ᕗ
 // General
 const int ledPin = 8;             // the number of the LED pin
 const int buttonPin = 9;          // the number of the pushbutton pin
-int zDelay1Interval = 60000;       // Délais en mili secondes pour le zDelay1
 
 
 // Sonar Pulse
@@ -82,12 +84,12 @@ int zDelay1Interval = 60000;       // Délais en mili secondes pour le zDelay1
 // Temperature sensor
 #include "zTemperature.h"
 
-
-// Deep Sleep
-#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-// #define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
-#define TIME_TO_SLEEP  60      /* Time ESP32 will go to sleep (in seconds) */
-RTC_DATA_ATTR int bootCount = 0;
+#if zDSLEEP == true
+  // Deep Sleep
+  #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+  // #define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
+  RTC_DATA_ATTR int bootCount = 0;
+#endif
 
 
 void setup() {
@@ -108,14 +110,15 @@ void setup() {
   delay(3000);                          //le temps de passer sur la Serial Monitor ;-)
   USBSerial.println("\n\n\n\n**************************************\nCa commence !"); USBSerial.println(zHOST ", " zVERSION);
 
-  //Increment boot number and print it every reboot
-  ++bootCount;
-  sensorValue4 = bootCount;
-  USBSerial.println("Boot number: " + String(bootCount));
-
-  // Configuration du dsleep
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
-  USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
+  #if zDSLEEP == true
+    //Increment boot number and print it every reboot
+    ++bootCount;
+    sensorValue4 = bootCount;
+    USBSerial.println("Boot number: " + String(bootCount));
+    // Configuration du dsleep
+    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+    USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
+  #endif
 
   // Start WIFI
   zStartWifi();
@@ -135,15 +138,16 @@ void setup() {
   zEnvoieTouteLaSauce();
   USBSerial.println("\nC'est envoyé !\n");
 
-  // // Partie dsleep. On va dormir !
-  // USBSerial.println("Going to sleep now");
-  // delay(200);
-  // USBSerial.flush(); 
-  // esp_deep_sleep_start();
-  // USBSerial.println("This will never be printed");
+  #if zDSLEEP == true
+    // Partie dsleep. On va dormir !
+    USBSerial.println("Going to sleep now");
+    delay(200);
+    USBSerial.flush(); 
+    esp_deep_sleep_start();
+    USBSerial.println("This will never be printed");
+  #endif
 
 }
-
 
 void loop() {
   // Envoie toute la sauce !
