@@ -5,11 +5,11 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240606.1603"
+#define zVERSION        "zf240607.0912"
 #define zHOST           "thi5"              // ATTENTION, tout en minuscule
 #define zDSLEEP         true                // true ou false
-#define TIME_TO_SLEEP   300                 // dSleep en secondes 
-int zDelay1Interval =   60000;              // Délais en mili secondes pour la boucle loop
+#define TIME_TO_SLEEP   120                 // dSleep en secondes 
+int zDelay1Interval =   2000;              // Délais en mili secondes pour la boucle loop
 
 /*
 Utilisation:
@@ -170,14 +170,20 @@ void zEnvoieTouteLaSauce(){
   // Graphe sur l'Arduino IDE les courbes des mesures
   USBSerial.print("sensor1:");
   USBSerial.print(sensorValue1);
-  USBSerial.print(",sensor2:");
-  USBSerial.print(sensorValue2);
-  USBSerial.print(",sensor3:");
-  USBSerial.print(sensorValue3);
-  USBSerial.print(",sensor4:");
-  USBSerial.print(sensorValue4);
-  USBSerial.print(",sensor5:");
-  USBSerial.println(sensorValue5);
+  USBSerial.print(",tempInternal1:");
+  USBSerial.print(tempInternal1);
+  USBSerial.print(",tempInternal2:");
+  USBSerial.print(tempInternal2);
+
+  // USBSerial.print(",sensor2:");
+  // USBSerial.print(sensorValue2);
+  // USBSerial.print(",sensor3:");
+  // USBSerial.print(sensorValue3);
+  // USBSerial.print(",sensor4:");
+  // USBSerial.print(sensorValue4);
+  // USBSerial.print(",sensor5:");
+  // USBSerial.print(sensorValue5);
+  USBSerial.println("");
 }
 
 

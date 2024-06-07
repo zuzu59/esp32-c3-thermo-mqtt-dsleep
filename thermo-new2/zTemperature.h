@@ -31,11 +31,21 @@ void initDS18B20Sensor(){
 }
 
 
+RTC_DATA_ATTR float tempInternal1 = 0;
+RTC_DATA_ATTR float tempInternal2 = 0;
+
+
 // Lit les senseurs
 void readSensor(){
     // lit la température interne
     sensorValue1 = temperatureRead();
     sensorValue1 = sensorValue1 - 10.5;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
+
+    // moyenne glissante
+    sensorValue1 = (sensorValue1 + tempInternal1 + tempInternal2) / 3;
+    tempInternal1 = tempInternal2;
+    tempInternal2 = sensorValue1;
+
     // lit la température du DS18B20
     sensors.requestTemperatures(); 
     sensorValue5 = sensors.getTempCByIndex(0);
