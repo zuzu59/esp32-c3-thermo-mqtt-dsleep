@@ -5,11 +5,11 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240607.0912"
-#define zHOST           "thi5"              // ATTENTION, tout en minuscule
-#define zDSLEEP         true                // true ou false
+#define zVERSION        "zf240615.1756"
+#define zHOST           "thi7"              // ATTENTION, tout en minuscule
+#define zDSLEEP         0                       // 0 ou 1 !
 #define TIME_TO_SLEEP   120                 // dSleep en secondes 
-int zDelay1Interval =   2000;              // Délais en mili secondes pour la boucle loop
+int zDelay1Interval =   5000;              // Délais en mili secondes pour la boucle loop
 
 /*
 Utilisation:
@@ -84,7 +84,7 @@ const int buttonPin = 9;          // the number of the pushbutton pin
 // Temperature sensor
 #include "zTemperature.h"
 
-#if zDSLEEP == true
+#if zDSLEEP == 1
   // Deep Sleep
   #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
   // #define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
@@ -110,7 +110,7 @@ void setup() {
   delay(3000);                          //le temps de passer sur la Serial Monitor ;-)
   USBSerial.println("\n\n\n\n**************************************\nCa commence !"); USBSerial.println(zHOST ", " zVERSION);
 
-  #if zDSLEEP == true
+  #if zDSLEEP == 1
     //Increment boot number and print it every reboot
     ++bootCount;
     sensorValue4 = bootCount;
@@ -138,7 +138,7 @@ void setup() {
   zEnvoieTouteLaSauce();
   USBSerial.println("\nC'est envoyé !\n");
 
-  #if zDSLEEP == true
+  #if zDSLEEP == 1
     // Partie dsleep. On va dormir !
     USBSerial.println("Going to sleep now");
     delay(200);
