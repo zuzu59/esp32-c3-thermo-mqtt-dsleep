@@ -1,4 +1,4 @@
-// zf240725.1800
+// zf240726.1058
 
 // Sources:
 // https://randomnerdtutorials.com/esp32-useful-wi-fi-functions-arduino
@@ -56,6 +56,8 @@ void zWifiTrouble(){
     wifi_creds.push_back(creds6);
     WifiCredentials creds7 = {WIFI_SSID7, WIFI_PASSWORD7};
     wifi_creds.push_back(creds7);
+    WifiCredentials creds8 = {WIFI_SSID8, WIFI_PASSWORD8};
+    wifi_creds.push_back(creds8);
 
     int best_rssi = -1000;
     String best_ssid;
@@ -92,7 +94,7 @@ void zWifiTrouble(){
       USBSerial.print("Connecting to ");
       USBSerial.println(best_ssid);
       int connAttempts = 0;
-      while (WiFi.status() != WL_CONNECTED && connAttempts < 20) {
+      while (WiFi.status() != WL_CONNECTED && connAttempts < 30) {
         delay(500);
         USBSerial.print(".");
         connAttempts++;
