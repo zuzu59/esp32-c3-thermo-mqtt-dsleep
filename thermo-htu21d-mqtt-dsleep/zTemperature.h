@@ -1,4 +1,4 @@
-// zf240725.1731
+// zf240726.2228
 
 // Sources:
 // https://microcontrollerslab.com/esp32-htu21d-temperature-humidity-sensor-tutorial/
@@ -38,7 +38,7 @@ RTC_DATA_ATTR float tempInternal2 = 0;
 void readSensor(){
     // lit la température interne
     sensorValue1 = temperatureRead();
-    sensorValue1 = sensorValue1 - 8.0;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
+    sensorValue1 = sensorValue1 - 7.0;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
 
     // moyenne glissante
     sensorValue1 = (sensorValue1 + tempInternal1 + tempInternal2) / 3;
