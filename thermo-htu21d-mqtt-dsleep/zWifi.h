@@ -22,9 +22,9 @@ float rrsiLevel = 0;      // variable to store the RRSI level
 
 
 void zWifiTrouble(){
-  USBSerial.println("\nOn a un problème avec le WIFI !");
+  Serial.println("\nOn a un problème avec le WIFI !");
   delay(200);
-  USBSerial.flush(); 
+  Serial.flush(); 
   // On part en dsleep pour économiser la batterie !
   esp_deep_sleep_start();
     // ESP.restart();
@@ -67,13 +67,13 @@ void zWifiTrouble(){
     WiFi.disconnect();
     delay(100);
     int n = WiFi.scanNetworks();
-    USBSerial.print("Number SSID scanned: ");
-    USBSerial.println(n);
+    Serial.print("Number SSID scanned: ");
+    Serial.println(n);
     for (int i = 0; i < n; i++) {
-      USBSerial.print("SSID scanned: ");
-      USBSerial.println(WiFi.SSID(i));
-      USBSerial.print("RSSI: ");
-      USBSerial.println(WiFi.RSSI(i));
+      Serial.print("SSID scanned: ");
+      Serial.println(WiFi.SSID(i));
+      Serial.print("RSSI: ");
+      Serial.println(WiFi.RSSI(i));
       for (const auto &cred : wifi_creds) {
         if (WiFi.SSID(i) == cred.ssid) {
           int rssi = WiFi.RSSI(i);
@@ -91,22 +91,22 @@ void zWifiTrouble(){
 
       WiFi.setTxPower(WIFI_POWER_8_5dBm);  // diminution de la puissance à cause de la réflexion de l'antenne sur le HTU21D directement soudé sur le esp32-c3 super mini zf240725.1800
 
-      USBSerial.print("Connecting to ");
-      USBSerial.println(best_ssid);
+      Serial.print("Connecting to ");
+      Serial.println(best_ssid);
       int connAttempts = 0;
       while (WiFi.status() != WL_CONNECTED && connAttempts < 30) {
         delay(500);
-        USBSerial.print(".");
+        Serial.print(".");
         connAttempts++;
       }
-      USBSerial.println("");
+      Serial.println("");
       if (WiFi.status() == WL_CONNECTED) {
       } else {
-        USBSerial.println("Failed to connect");
+        Serial.println("Failed to connect");
         zWifiTrouble();
       }
     } else {
-      USBSerial.println("No known networks found");
+      Serial.println("No known networks found");
       zWifiTrouble();
     }
   }
@@ -118,12 +118,12 @@ void zWifiTrouble(){
 
   static void ConnectWiFi() {
     WiFi.mode(WIFI_STA);
-    USBSerial.println("Connexion en WIFI Manager");
+    Serial.println("Connexion en WIFI Manager");
     // si le bouton FLASH de l'esp32-c3 est appuyé dans les 3 secondes après le boot, la config WIFI sera effacée !
     pinMode(buttonPin, INPUT_PULLUP);
     if ( digitalRead(buttonPin) == LOW) {
       WiFiManager wm; wm.resetSettings();
-      USBSerial.println("Config WIFI effacée !"); delay(1000);
+      Serial.println("Config WIFI effacée !"); delay(1000);
       ESP.restart();
     }
     WiFiManager wm;
@@ -138,15 +138,15 @@ void zWifiTrouble(){
 
 #ifdef zWifiNormal
   static void ConnectWiFi() {
-  USBSerial.println("Connexion en WIFI Normal avec secrets.h");
-  USBSerial.printf("WIFI_SSID: %s\nWIFI_PASSWORD: %s\n", WIFI_SSID, WIFI_PASSWORD);
+  Serial.println("Connexion en WIFI Normal avec secrets.h");
+  Serial.printf("WIFI_SSID: %s\nWIFI_PASSWORD: %s\n", WIFI_SSID, WIFI_PASSWORD);
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   // WiFi.setTxPower(WIFI_POWER_8_5dBm);  //c'est pour le Lolin esp32-c3 mini V1 ! https://www.wemos.cc/en/latest/c3/c3_mini_1_0_0.html
-  USBSerial.println("Connecting");
+  Serial.println("Connecting");
   long zWifiTiemeout = 10000 + millis(); 
   while(WiFi.status() != WL_CONNECTED){
-    USBSerial.print("."); delay(100);
+    Serial.print("."); delay(100);
     if(millis() > zWifiTiemeout ){
       zWifiTrouble();
     }
@@ -167,15 +167,15 @@ void zStartWifi(){
   #ifdef zWifiAuto
     connectToBestWifi();
   #endif
-  USBSerial.println("\nConnecté au réseau WiFi !");
-  USBSerial.print("SSID: ");
-  USBSerial.println(WiFi.SSID());
-  USBSerial.print("RSSI: ");
-  USBSerial.println(WiFi.RSSI());
+  Serial.println("\nConnecté au réseau WiFi !");
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+  Serial.print("RSSI: ");
+  Serial.println(WiFi.RSSI());
   int txPower = WiFi.getTxPower();
-  USBSerial.print("TX power: ");
-  USBSerial.println(txPower);  
-  USBSerial.print("IP: ");
-  USBSerial.println(WiFi.localIP());
+  Serial.print("TX power: ");
+  Serial.println(txPower);  
+  Serial.print("IP: ");
+  Serial.println(WiFi.localIP());
   digitalWrite(ledPin, LOW);
 }

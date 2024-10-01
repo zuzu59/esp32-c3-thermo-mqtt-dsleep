@@ -28,12 +28,12 @@ WebServer server(80);
 static void otaWebServer() {
   /*use mdns for host name resolution*/
   if (!MDNS.begin(zHOST)) {         //http://xxx.local
-    USBSerial.println("Error setting up MDNS responder!");
+    Serial.println("Error setting up MDNS responder!");
     while (1) {
       delay(1000);
     }
   }
-  USBSerial.println("mDNS responder started");
+  Serial.println("mDNS responder started");
 
   /*return index page which is stored in serverIndex */
   server.on("/", HTTP_GET, []() {
@@ -52,20 +52,20 @@ static void otaWebServer() {
   }, []() {
     HTTPUpload& upload = server.upload();
     if (upload.status == UPLOAD_FILE_START) {
-      USBSerial.printf("Update: %s\n", upload.filename.c_str());
+      Serial.printf("Update: %s\n", upload.filename.c_str());
       if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
-        Update.printError(USBSerial);
+        Update.printError(Serial);
       }
     } else if (upload.status == UPLOAD_FILE_WRITE) {
       /* flashing firmware to ESP*/
       if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-        Update.printError(USBSerial);
+        Update.printError(Serial);
       }
     } else if (upload.status == UPLOAD_FILE_END) {
       if (Update.end(true)) { //true to set the size to the current progress
-        USBSerial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+        Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
       } else {
-        Update.printError(USBSerial);
+        Update.printError(Serial);
       }
     }
   });

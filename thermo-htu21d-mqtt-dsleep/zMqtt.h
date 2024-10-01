@@ -58,7 +58,7 @@ static void ConnectMQTT() {
     Sensor5.setUnitOfMeasurement("°C");
 
     mqtt.begin(BROKER_ADDR, BROKER_USERNAME, BROKER_PASSWORD);
-    USBSerial.println("MQTT connected");
+    Serial.println("MQTT connected");
 }
 
 // Envoie les senseurs au mqtt
