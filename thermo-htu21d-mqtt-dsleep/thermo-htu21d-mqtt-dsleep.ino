@@ -3,9 +3,9 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240726.2224"
-#define zHOST           "balise_1_v2"              // ATTENTION, tout en minuscule
-#define zDSLEEP         1                       // 0 ou 1 !
+#define zVERSION        "zf241001.1456"
+#define zHOST           "y-fablab-th1"              // ATTENTION, tout en minuscule
+#define zDSLEEP         0                       // 0 ou 1 !
 #define TIME_TO_SLEEP   120                 // dSleep en secondes 
 int zDelay1Interval =   5000;              // Délais en mili secondes pour la boucle loop
 
@@ -26,7 +26,7 @@ Installation:
 
 Pour les esp32-c3 super mini, il faut:
  * choisir comme board ESP32C3 Dev Module
- * disabled USB CDC On Boot et utiliser USBSerial. au lieu de Serial. pour la console !
+ * !?! avec les nouvelles lib arduino ce n'est peut-être plus vrai !  zf241001.1503   disabled USB CDC On Boot et utiliser USBSerial. au lieu de Serial. pour la console !
  * changer le schéma de la partition à Minimal SPIFFS (1.9MB APP with OTA/190kB SPIFFS)
 
 Pour le WiFiManager, il faut installer cette lib depuis le lib manager sur Arduino:
