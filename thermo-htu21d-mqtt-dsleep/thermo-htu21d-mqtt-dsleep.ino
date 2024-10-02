@@ -3,11 +3,14 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf241001.2022"
-#define zHOST           "y-fablab-th2"              // ATTENTION, tout en minuscule
-#define zDSLEEP         0                       // 0 ou 1 !
-#define TIME_TO_SLEEP   120                 // dSleep en secondes 
-int zDelay1Interval =   5000;              // Délais en mili secondes pour la boucle loop
+#define zVERSION        "zf241002.1441"
+
+// #define zHOST           "y-fablab-th2"              // ATTENTION, tout en minuscule
+#define zHOST           "thi-tst1"              // ATTENTION, tout en minuscule
+
+#define zDSLEEP         1                       // 0 ou 1 !
+#define TIME_TO_SLEEP   300                     // dSleep en secondes 
+int zDelay1Interval =   30000;                   // Délais en mili secondes pour la boucle loop
 
 /*
 Utilisation:
@@ -131,6 +134,10 @@ void setup() {
   // Connexion au MQTT
   Serial.println("\n\nConnect MQTT !\n");
   ConnectMQTT();
+
+  Serial.print("http://");
+  Serial.print(zHOST);
+  Serial.println(".local");
 
   // go go go
   Serial.println("\nC'est parti !\n");
