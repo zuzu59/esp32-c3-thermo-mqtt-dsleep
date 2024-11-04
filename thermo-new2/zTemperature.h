@@ -1,4 +1,4 @@
-// zf241104.1359
+// zf241104.1804
 
 // Temperature sensor DS18B20
 #include <OneWire.h>
@@ -42,19 +42,19 @@ void readSensor(){
   sensorValue1 = sensorValue1 - 8.0;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
 
   if (zHOST == "thi1"){
-    sensorValue1 = sensorValue1 - 2.0;        // Etalonnage précise de la température pour un esp32-c3 propre
+    sensorValue1 = sensorValue1 + 1.3;        // Etalonnage précise de la température pour un esp32-c3 propre
   }
 
   if (zHOST == "thi2"){
-    sensorValue1 = sensorValue1 - 2.0;        // Etalonnage précise de la température pour un esp32-c3 propre
+    sensorValue1 = sensorValue1 + 0.5;        // Etalonnage précise de la température pour un esp32-c3 propre
   }
 
   if (zHOST == "thi3"){
-    sensorValue1 = sensorValue1 - 0.5;        // Etalonnage précise de la température pour un esp32-c3 propre
+    sensorValue1 = sensorValue1 + 1.5;        // Etalonnage précise de la température pour un esp32-c3 propre
   }
 
   if (zHOST == "thi4"){
-    sensorValue1 = sensorValue1 - 1.5;        // Etalonnage précise de la température pour un esp32-c3 propre
+    sensorValue1 = sensorValue1 - 0.8;        // Etalonnage précise de la température pour un esp32-c3 propre
   }
 
   // moyenne glissante
