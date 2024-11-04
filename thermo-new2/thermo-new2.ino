@@ -5,9 +5,13 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf241104.1359"
+#define zVERSION        "zf241104.1757"
+
+
 #define zHOST           "thi4"              // ATTENTION, tout en minuscule
 #define zDSLEEP         1                       // 0 ou 1 !
+
+
 #define TIME_TO_SLEEP   300                 // dSleep en secondes 
 int zDelay1Interval =   5000;              // Délais en mili secondes pour la boucle loop
 
@@ -63,6 +67,7 @@ https://chat.mistral.ai/    pour toute la partie API REST et wifiAuto ᕗ
 // General
 const int ledPin = 8;             // the number of the LED pin
 const int buttonPin = 9;          // the number of the pushbutton pin
+#include "secrets.h"
 
 
 // Sonar Pulse
@@ -70,6 +75,7 @@ const int buttonPin = 9;          // the number of the pushbutton pin
 
 
 // WIFI
+#define lowTxPower  true   // diminution de la puissance à cause de la réflexion de l'antenne sur le HTU21D directement soudé sur le esp32-c3 super mini zf240725.1800
 #include "zWifi.h"
 
 
