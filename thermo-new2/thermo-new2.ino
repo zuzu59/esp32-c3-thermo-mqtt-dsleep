@@ -5,7 +5,7 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240725.1142"
+#define zVERSION        "zf241104.1117"
 #define zHOST           "thi4"              // ATTENTION, tout en minuscule
 #define zDSLEEP         1                       // 0 ou 1 !
 #define TIME_TO_SLEEP   300                 // dSleep en secondes 
@@ -25,7 +25,7 @@ Installation:
 
 Pour les esp32-c3 super mini, il faut:
  * choisir comme board ESP32C3 Dev Module
- * disabled USB CDC On Boot et utiliser USBSerial. au lieu de Serial. pour la console !
+ * enabled USB CDC On Boot si on veut que la console serial fonctionne !
  * changer le schéma de la partition à Minimal SPIFFS (1.9MB APP with OTA/190kB SPIFFS)
 
 Pour le WiFiManager, il faut installer cette lib depuis le lib manager sur Arduino:
@@ -105,19 +105,19 @@ void setup() {
   delay(zSonarPulseWait);
 
   // Start serial console
-  USBSerial.begin(19200);
-  USBSerial.setDebugOutput(true);       //pour voir les messages de debug des libs sur la console série !
+  Serial.begin(19200);
+  Serial.setDebugOutput(true);       //pour voir les messages de debug des libs sur la console série !
   delay(3000);                          //le temps de passer sur la Serial Monitor ;-)
-  USBSerial.println("\n\n\n\n**************************************\nCa commence !"); USBSerial.println(zHOST ", " zVERSION);
+  Serial.println("\n\n\n\n**************************************\nCa commence !"); Serial.println(zHOST ", " zVERSION);
 
   #if zDSLEEP == 1
     //Increment boot number and print it every reboot
     ++bootCount;
     sensorValue4 = bootCount;
-    USBSerial.println("Boot number: " + String(bootCount));
+    Serial.println("Boot number: " + String(bootCount));
     // Configuration du dsleep
     esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
-    USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
+    Serial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
   #endif
 
   // Start WIFI
@@ -128,23 +128,23 @@ void setup() {
   otaWebServer();
 
   // Connexion au MQTT
-  USBSerial.println("\n\nConnect MQTT !\n");
+  Serial.println("\n\nConnect MQTT !\n");
   ConnectMQTT();
 
   // go go go
-  USBSerial.println("\nC'est parti !\n");
+  Serial.println("\nC'est parti !\n");
 
   // Envoie toute la sauce !
   zEnvoieTouteLaSauce();
-  USBSerial.println("\nC'est envoyé !\n");
+  Serial.println("\nC'est envoyé !\n");
 
   #if zDSLEEP == 1
     // Partie dsleep. On va dormir !
-    USBSerial.println("Going to sleep now");
+    Serial.println("Going to sleep now");
     delay(200);
-    USBSerial.flush(); 
+    Serial.flush(); 
     esp_deep_sleep_start();
-    USBSerial.println("This will never be printed");
+    Serial.println("This will never be printed");
   #endif
 
 }
@@ -168,22 +168,22 @@ void zEnvoieTouteLaSauce(){
   sendSensorMqtt();
 
   // Graphe sur l'Arduino IDE les courbes des mesures
-  USBSerial.print("sensor1:");
-  USBSerial.print(sensorValue1);
-  USBSerial.print(",tempInternal1:");
-  USBSerial.print(tempInternal1);
-  USBSerial.print(",tempInternal2:");
-  USBSerial.print(tempInternal2);
+  Serial.print("sensor1:");
+  Serial.print(sensorValue1);
+  Serial.print(",tempInternal1:");
+  Serial.print(tempInternal1);
+  Serial.print(",tempInternal2:");
+  Serial.print(tempInternal2);
 
-  // USBSerial.print(",sensor2:");
-  // USBSerial.print(sensorValue2);
-  // USBSerial.print(",sensor3:");
-  // USBSerial.print(sensorValue3);
-  // USBSerial.print(",sensor4:");
-  // USBSerial.print(sensorValue4);
-  // USBSerial.print(",sensor5:");
-  // USBSerial.print(sensorValue5);
-  USBSerial.println("");
+  // Serial.print(",sensor2:");
+  // Serial.print(sensorValue2);
+  // Serial.print(",sensor3:");
+  // Serial.print(sensorValue3);
+  // Serial.print(",sensor4:");
+  // Serial.print(sensorValue4);
+  // Serial.print(",sensor5:");
+  // Serial.print(sensorValue5);
+  Serial.println("");
 }
 
 

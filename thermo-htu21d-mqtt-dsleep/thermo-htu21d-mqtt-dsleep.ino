@@ -3,7 +3,7 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3 super mini. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf241002.1529"
+#define zVERSION        "zf241002.1734"
 
 // #define zHOST           "y-fablab-th2"              // ATTENTION, tout en minuscule
 // #define zHOST           "thi-tst1"              // ATTENTION, tout en minuscule

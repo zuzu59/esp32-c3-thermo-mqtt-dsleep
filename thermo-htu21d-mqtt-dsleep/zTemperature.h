@@ -38,7 +38,7 @@ RTC_DATA_ATTR float tempInternal2 = 0;
 void readSensor(){
     // lit la température interne
     sensorValue1 = temperatureRead();
-    sensorValue1 = sensorValue1 - 7.0;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
+    sensorValue1 = sensorValue1 - 7.0 + 1.2;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908, zf241002.1734
 
     // moyenne glissante
     sensorValue1 = (sensorValue1 + tempInternal1 + tempInternal2) / 3;
