@@ -1,4 +1,4 @@
-// zf240607.1144
+// zf241104.1123
 
 // Temperature sensor DS18B20
 #include <OneWire.h>
@@ -37,16 +37,32 @@ RTC_DATA_ATTR float tempInternal2 = 0;
 
 // Lit les senseurs
 void readSensor(){
-    // lit la température interne
-    sensorValue1 = temperatureRead();
-    sensorValue1 = sensorValue1 - 8.0;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
+  // lit la température interne
+  sensorValue1 = temperatureRead();
+  sensorValue1 = sensorValue1 - 8.0;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
 
-    // moyenne glissante
-    sensorValue1 = (sensorValue1 + tempInternal1 + tempInternal2) / 3;
-    tempInternal1 = tempInternal2;
-    tempInternal2 = sensorValue1;
+  if (zHOST == "thi1"){
+    sensorValue1 = sensorValue1 - 8.0 - 2.0;        // Etalonnage précise de la température pour un esp32-c3 propre
+  }
 
-    // lit la température du DS18B20
-    sensors.requestTemperatures(); 
-    sensorValue5 = sensors.getTempCByIndex(0);
+  if (zHOST == "thi2"){
+    sensorValue1 = sensorValue1 - 8.0 - 2.0;        // Etalonnage précise de la température pour un esp32-c3 propre
+  }
+
+  if (zHOST == "thi3"){
+    sensorValue1 = sensorValue1 - 8.0 - 0.5;        // Etalonnage précise de la température pour un esp32-c3 propre
+  }
+
+  if (zHOST == "thi4"){
+    sensorValue1 = sensorValue1 - 8.0 - 1.5;        // Etalonnage précise de la température pour un esp32-c3 propre
+  }
+
+  // moyenne glissante
+  sensorValue1 = (sensorValue1 + tempInternal1 + tempInternal2) / 3;
+  tempInternal1 = tempInternal2;
+  tempInternal2 = sensorValue1;
+
+  // lit la température du DS18B20
+  sensors.requestTemperatures(); 
+  sensorValue5 = sensors.getTempCByIndex(0);
 }
